@@ -23,10 +23,10 @@ public class DriverService {
         }
 
         /**
-         * ID'ye göre pilot getir
+         * ID'ye göre pilot getir (yarış sonuçlarıyla birlikte)
          */
         public Driver getDriverById(Long id) {
-                return driverRepository.findById(id).orElse(null);
+                return driverRepository.findByIdWithRaceResults(id).orElse(null);
         }
 
         /**

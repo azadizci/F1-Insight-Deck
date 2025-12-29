@@ -2,6 +2,7 @@ package com.f1insight.service;
 
 import com.f1insight.dto.jolpica.JolpicaResponse;
 import com.f1insight.model.Driver;
+import com.f1insight.model.RaceResult;
 import com.f1insight.repository.DriverRepository;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,6 +16,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,8 +119,8 @@ public class F1DataService {
         logger.info("{} yılı için pilot verileri çekiliyor...", year);
 
         try {
-            // Önce podium sayılarını hesapla
-            Map<String, Integer> podiumCounts = fetchPodiumCounts(year);
+            // Yarış sonuçlarını çek (podium + son 10 yarış)
+            RaceData raceData = fetchRaceData(year);
 
             String url = API_URL + "/" + year + "/driverStandings.json?limit=100";
 
@@ -146,7 +148,7 @@ public class F1DataService {
                             .getDriverStandings();
 
                     for (var standing : driverStandings) {
-                        saveDriver(standing, podiumCounts);
+                        saveDriver(standing, raceData);
                     }
 
                     logger.info("{} pilot başarıyla veritabanına kaydedildi.", driverStandings.size());
@@ -164,11 +166,29 @@ public class F1DataService {
     }
 
     /**
-     * Yarış sonuçlarından her pilotun podium sayısını hesaplar
+     * Yarış verilerini tutan yardımcı sınıf
+     */
+    private static class RaceData {
+        Map<String, Integer> podiumCounts = new HashMap<>();
+        Map<String, List<RaceInfo>> driverRaces = new HashMap<>();
+    }
+
+    private static class RaceInfo {
+        String raceName;
+        int position;
+
+        RaceInfo(String raceName, int position) {
+            this.raceName = raceName;
+            this.position = position;
+        }
+    }
+
+    /**
+     * Yarış sonuçlarından podium sayılarını ve yarış sonuçlarını çeker
      * API max 100 sonuç döndürdüğü için pagination kullanıyoruz
      */
-    private Map<String, Integer> fetchPodiumCounts(int year) {
-        Map<String, Integer> podiumCounts = new HashMap<>();
+    private RaceData fetchRaceData(int year) {
+        RaceData raceData = new RaceData();
 
         try {
             int offset = 0;
@@ -203,16 +223,28 @@ public class F1DataService {
                             for (RaceResultsResponse.Race race : response.mrData.raceTable.races) {
                                 if (race.results != null) {
                                     for (RaceResultsResponse.Result result : race.results) {
-                                        // Position 1, 2 veya 3 ise podium
                                         try {
                                             int position = Integer.parseInt(result.position);
+                                            String driverName = result.driver.givenName + " "
+                                                    + result.driver.familyName;
+
+                                            // Podium sayısı
                                             if (position >= 1 && position <= 3) {
-                                                String driverName = result.driver.givenName + " "
-                                                        + result.driver.familyName;
-                                                podiumCounts.merge(driverName, 1, Integer::sum);
+                                                raceData.podiumCounts.merge(driverName, 1, Integer::sum);
                                             }
+
+                                            // Yarış sonucunu kaydet
+                                            raceData.driverRaces
+                                                    .computeIfAbsent(driverName, k -> new ArrayList<>())
+                                                    .add(new RaceInfo(race.raceName, position));
+
                                         } catch (NumberFormatException e) {
-                                            // "R" (Retired) gibi değerler, yoksay
+                                            // "R" (Retired) gibi değerler - yarış adını yine de kaydet
+                                            String driverName = result.driver.givenName + " "
+                                                    + result.driver.familyName;
+                                            raceData.driverRaces
+                                                    .computeIfAbsent(driverName, k -> new ArrayList<>())
+                                                    .add(new RaceInfo(race.raceName, 20)); // DNF için 20
                                         }
                                     }
                                 }
@@ -228,19 +260,18 @@ public class F1DataService {
 
             } while (offset < total);
 
-            // Debug: Podium sayılarını logla
-            podiumCounts.forEach((name, count) -> logger.info("Podium: {} = {}", name, count));
-
-            logger.info("Podium sayıları hesaplandı: {} pilot", podiumCounts.size());
+            // Debug log
+            logger.info("Podium sayıları hesaplandı: {} pilot", raceData.podiumCounts.size());
+            logger.info("Yarış sonuçları toplandı: {} pilot", raceData.driverRaces.size());
 
         } catch (Exception e) {
-            logger.warn("Podium verileri çekilemedi: {}", e.getMessage());
+            logger.warn("Yarış verileri çekilemedi: {}", e.getMessage());
         }
 
-        return podiumCounts;
+        return raceData;
     }
 
-    private void saveDriver(JolpicaResponse.DriverStanding standing, Map<String, Integer> podiumCounts) {
+    private void saveDriver(JolpicaResponse.DriverStanding standing, RaceData raceData) {
         var driverDto = standing.getDriver();
         var constructorDto = standing.getConstructors().isEmpty() ? null : standing.getConstructors().get(0);
 
@@ -258,13 +289,37 @@ public class F1DataService {
         driver.setCountry(driverDto.getNationality());
 
         // Gerçek podium sayısını kullan
-        int podiums = podiumCounts.getOrDefault(fullName, 0);
+        int podiums = raceData.podiumCounts.getOrDefault(fullName, 0);
         driver.setPodiums(podiums);
 
         // Görsel verileri ayarla
         populateVisualData(driver);
 
+        // Önce driver'ı kaydet (ID alması için)
+        driver = driverRepository.save(driver);
+
+        // Son 10 yarış sonucunu ekle
+        List<RaceInfo> allRaces = raceData.driverRaces.getOrDefault(fullName, new ArrayList<>());
+        // Son 10 yarışı al (listedeki son 10)
+        int startIndex = Math.max(0, allRaces.size() - 10);
+        List<RaceInfo> last10Races = allRaces.subList(startIndex, allRaces.size());
+
+        // Mevcut yarış sonuçlarını temizle
+        if (driver.getLastTenRaces() != null) {
+            driver.getLastTenRaces().clear();
+        } else {
+            driver.setLastTenRaces(new ArrayList<>());
+        }
+
+        // Yeni yarış sonuçlarını ekle
+        for (RaceInfo raceInfo : last10Races) {
+            RaceResult raceResult = new RaceResult(raceInfo.raceName, raceInfo.position);
+            raceResult.setDriver(driver);
+            driver.getLastTenRaces().add(raceResult);
+        }
+
         driverRepository.save(driver);
+        logger.debug("Pilot kaydedildi: {} - {} yarış sonucu", fullName, last10Races.size());
     }
 
     private int parseInteger(String value) {
@@ -346,6 +401,8 @@ public class F1DataService {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         static class Race {
+            @JsonProperty("raceName")
+            public String raceName;
             @JsonProperty("Results")
             public List<Result> results;
         }

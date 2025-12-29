@@ -26,7 +26,7 @@ public class Driver {
     private String teamLogo;
     private String teamColor;
 
-    @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<RaceResult> lastTenRaces;
 
     public Driver() {

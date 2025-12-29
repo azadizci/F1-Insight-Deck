@@ -1,5 +1,6 @@
 package com.f1insight.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,6 +18,7 @@ public class RaceResult {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id")
+    @JsonIgnore
     private Driver driver;
 
     public RaceResult() {
