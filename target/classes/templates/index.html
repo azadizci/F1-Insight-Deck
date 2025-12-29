@@ -745,9 +745,32 @@
 <body>
     <!-- Header -->
     <header class="header">
-        <div class="container text-center">
-            <h1 class="logo-title">F1 Insight Deck</h1>
-            <p class="subtitle">Driver Statistics Dashboard</p>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="text-center" style="flex: 1;">
+                    <h1 class="logo-title">F1 Insight Deck</h1>
+                    <p class="subtitle">Driver Statistics Dashboard</p>
+                </div>
+                <div class="user-nav" style="position: absolute; right: 40px; top: 50%; transform: translateY(-50%);">
+                    <div th:if="${session.userId}" class="logged-in"
+                        style="display: flex; align-items: center; gap: 15px;">
+                        <span style="color: rgba(255,255,255,0.8);">👋 Merhaba, <span th:text="${session.userName}"
+                                style="color: #e10600; font-weight: 600;">Kullanıcı</span></span>
+                        <a href="/profile"
+                            style="padding: 8px 16px; background: rgba(255,255,255,0.1); border-radius: 8px; color: white; text-decoration: none; font-size: 0.9rem;">Profil</a>
+                        <a href="/logout"
+                            style="padding: 8px 16px; border: 1px solid #e10600; border-radius: 8px; color: #e10600; text-decoration: none; font-size: 0.9rem;">Çıkış</a>
+                    </div>
+                    <div th:unless="${session.userId}" class="logged-out" style="display: flex; gap: 10px;">
+                        <a href="/login"
+                            style="padding: 8px 20px; background: rgba(255,255,255,0.1); border-radius: 8px; color: white; text-decoration: none; font-size: 0.9rem;">Giriş
+                            Yap</a>
+                        <a href="/register"
+                            style="padding: 8px 20px; background: #e10600; border-radius: 8px; color: white; text-decoration: none; font-size: 0.9rem; font-weight: 600;">Kayıt
+                            Ol</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 

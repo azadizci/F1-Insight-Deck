@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - F1 Insight Deck</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f0f 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .back-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover {
+            color: white;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: rgba(225, 6, 0, 0.2);
+            border: 1px solid #e10600;
+            border-radius: 8px;
+            color: #e10600;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #e10600;
+            color: white;
+        }
+
+        .profile-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #e10600, #ff3333);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .profile-info h1 {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .profile-info p {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .section-title {
+            color: white;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .favorite-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .favorite-card h3 {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .favorite-current {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(225, 6, 0, 0.1);
+            border: 1px solid rgba(225, 6, 0, 0.3);
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .favorite-current img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .favorite-current .name {
+            color: white;
+            font-weight: 600;
+        }
+
+        .favorite-current .team {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+
+        .favorite-current.empty {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .favorite-current.empty span {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .favorite-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.95rem;
+        }
+
+        .favorite-select:focus {
+            outline: none;
+            border-color: #e10600;
+        }
+
+        .favorite-select option {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            background: #e10600;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: #ff3333;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .alert-success {
+            background: rgba(0, 200, 83, 0.2);
+            border: 1px solid #00c853;
+            color: #66ff99;
+        }
+
+        .alert-error {
+            background: rgba(225, 6, 0, 0.2);
+            border: 1px solid #e10600;
+            color: #ff6666;
+        }
+
+        .user-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+        }
+
+        .info-item label {
+            display: block;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .info-item span {
+            color: white;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/" class="back-link">← Ana Sayfa</a>
+            <a href="/logout" class="logout-btn">Çıkış Yap</a>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="avatar" th:text="${user.firstName.charAt(0)}">S</div>
+                <div class="profile-info">
+                    <h1 th:text="${user.fullName}">Ad Soyad</h1>
+                    <p th:text="${user.email}">email@example.com</p>
+                </div>
+            </div>
+
+            <div class="user-info-grid">
+                <div class="info-item">
+                    <label>Cinsiyet</label>
+                    <span th:text="${user.gender?.displayName ?: 'Belirtilmemiş'}">-</span>
+                </div>
+                <div class="info-item">
+                    <label>Doğum Tarihi</label>
+                    <span th:text="${user.birthDate ?: 'Belirtilmemiş'}">-</span>
+                </div>
+                <div class="info-item">
+                    <label>Üyelik Tarihi</label>
+                    <span th:text="${#temporals.format(user.createdAt, 'dd.MM.yyyy')}">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <h2 class="section-title">⭐ Favorilerim</h2>
+
+            <div class="favorites-grid">
+                <!-- Favori Pilot -->
+                <div class="favorite-card">
+                    <h3>🏎️ Favori Pilot</h3>
+
+                    <div th:if="${user.favoriteDriver}" class="favorite-current">
+                        <img th:src="${user.favoriteDriver.imageUrl}" alt="Driver">
+                        <div>
+                            <div class="name" th:text="${user.favoriteDriver.name}">Pilot Adı</div>
+                            <div class="team" th:text="${user.favoriteDriver.team}">Takım</div>
+                        </div>
+                    </div>
+                    <div th:unless="${user.favoriteDriver}" class="favorite-current empty">
+                        <span>Henüz favori pilot seçilmedi</span>
+                    </div>
+
+                    <select id="favoriteDriver" class="favorite-select">
+                        <option value="">Pilot seçin...</option>
+                        <option th:each="driver : ${drivers}" th:value="${driver.id}"
+                            th:text="${driver.name + ' (' + driver.team + ')'}"
+                            th:selected="${user.favoriteDriver != null && user.favoriteDriver.id == driver.id}">
+                        </option>
+                    </select>
+                    <button onclick="saveFavoriteDriver()" class="save-btn">Kaydet</button>
+                </div>
+
+                <!-- Favori Takım -->
+                <div class="favorite-card">
+                    <h3>🏁 Favori Takım</h3>
+
+                    <div th:if="${user.favoriteTeam}" class="favorite-current">
+                        <div>
+                            <div class="name" th:text="${user.favoriteTeam}">Takım Adı</div>
+                        </div>
+                    </div>
+                    <div th:unless="${user.favoriteTeam}" class="favorite-current empty">
+                        <span>Henüz favori takım seçilmedi</span>
+                    </div>
+
+                    <select id="favoriteTeam" class="favorite-select">
+                        <option value="">Takım seçin...</option>
+                        <option th:each="team : ${teams}" th:value="${team}" th:text="${team}"
+                            th:selected="${user.favoriteTeam == team}">
+                        </option>
+                    </select>
+                    <button onclick="saveFavoriteTeam()" class="save-btn">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => container.innerHTML = '', 3000);
+        }
+
+        async function saveFavoriteDriver() {
+            const driverId = document.getElementById('favoriteDriver').value;
+            if (!driverId) {
+                showAlert('Lütfen bir pilot seçin!', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/user/favorite-driver', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `driverId=${driverId}`
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Bir hata oluştu!', 'error');
+            }
+        }
+
+        async function saveFavoriteTeam() {
+            const teamName = document.getElementById('favoriteTeam').value;
+            if (!teamName) {
+                showAlert('Lütfen bir takım seçin!', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/user/favorite-team', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `teamName=${encodeURIComponent(teamName)}`
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Bir hata oluştu!', 'error');
+            }
+        }
+    </script>
+</body>
+
+</html>
