@@ -1,0 +1,31 @@
+package com.f1insight.controller;
+
+import com.f1insight.model.Driver;
+import com.f1insight.service.DriverService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+public class F1Controller {
+
+    private final DriverService driverService;
+
+    public F1Controller(DriverService driverService) {
+        this.driverService = driverService;
+    }
+
+    @GetMapping("/")
+    public String index(Model model) {
+        model.addAttribute("drivers", driverService.getAllDrivers());
+        return "index";
+    }
+
+    @GetMapping("/api/driver/{id}")
+    @ResponseBody
+    public Driver getDriver(@PathVariable Long id) {
+        return driverService.getDriverById(id);
+    }
+}
