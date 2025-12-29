@@ -1,4 +1,5 @@
 # 🏎️ F1 Insight Deck
+<img width="1429" height="830" alt="Ekran Resmi 2026-12-29 22 51 56" src="https://github.com/user-attachments/assets/46953a92-c620-40e2-99e5-4415222a937e" />
 
 A stunning visual dashboard for Formula 1 driver statistics built with **Spring Boot 3.x** and **Thymeleaf**. Features an impressive F1 car "drive-by" animation when viewing driver details.
 
