@@ -1,11 +1,22 @@
 package com.f1insight.model;
 
+import jakarta.persistence.*;
 import java.util.List;
 
+@Entity
+@Table(name = "drivers")
 public class Driver {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String team;
+
     private int wins;
     private int podiums;
     private int points;
@@ -14,12 +25,15 @@ public class Driver {
     private String countryFlag;
     private String teamLogo;
     private String teamColor;
+
+    @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RaceResult> lastTenRaces;
 
-    public Driver() {}
+    public Driver() {
+    }
 
     public Driver(Long id, String name, String team, int wins, int podiums, int points,
-                  String imageUrl, String country, String countryFlag, String teamLogo, String teamColor) {
+            String imageUrl, String country, String countryFlag, String teamLogo, String teamColor) {
         this.id = id;
         this.name = name;
         this.team = team;
@@ -34,39 +48,99 @@ public class Driver {
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getTeam() { return team; }
-    public void setTeam(String team) { this.team = team; }
+    public String getName() {
+        return name;
+    }
 
-    public int getWins() { return wins; }
-    public void setWins(int wins) { this.wins = wins; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public int getPodiums() { return podiums; }
-    public void setPodiums(int podiums) { this.podiums = podiums; }
+    public String getTeam() {
+        return team;
+    }
 
-    public int getPoints() { return points; }
-    public void setPoints(int points) { this.points = points; }
+    public void setTeam(String team) {
+        this.team = team;
+    }
 
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public int getWins() {
+        return wins;
+    }
 
-    public String getCountry() { return country; }
-    public void setCountry(String country) { this.country = country; }
+    public void setWins(int wins) {
+        this.wins = wins;
+    }
 
-    public String getCountryFlag() { return countryFlag; }
-    public void setCountryFlag(String countryFlag) { this.countryFlag = countryFlag; }
+    public int getPodiums() {
+        return podiums;
+    }
 
-    public String getTeamLogo() { return teamLogo; }
-    public void setTeamLogo(String teamLogo) { this.teamLogo = teamLogo; }
+    public void setPodiums(int podiums) {
+        this.podiums = podiums;
+    }
 
-    public String getTeamColor() { return teamColor; }
-    public void setTeamColor(String teamColor) { this.teamColor = teamColor; }
+    public int getPoints() {
+        return points;
+    }
 
-    public List<RaceResult> getLastTenRaces() { return lastTenRaces; }
-    public void setLastTenRaces(List<RaceResult> lastTenRaces) { this.lastTenRaces = lastTenRaces; }
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getCountryFlag() {
+        return countryFlag;
+    }
+
+    public void setCountryFlag(String countryFlag) {
+        this.countryFlag = countryFlag;
+    }
+
+    public String getTeamLogo() {
+        return teamLogo;
+    }
+
+    public void setTeamLogo(String teamLogo) {
+        this.teamLogo = teamLogo;
+    }
+
+    public String getTeamColor() {
+        return teamColor;
+    }
+
+    public void setTeamColor(String teamColor) {
+        this.teamColor = teamColor;
+    }
+
+    public List<RaceResult> getLastTenRaces() {
+        return lastTenRaces;
+    }
+
+    public void setLastTenRaces(List<RaceResult> lastTenRaces) {
+        this.lastTenRaces = lastTenRaces;
+    }
 }
