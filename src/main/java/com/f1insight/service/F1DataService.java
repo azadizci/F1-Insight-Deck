@@ -73,17 +73,15 @@ public class F1DataService {
         String lapRecordHolder;
         int lapRecordYear;
         String countryFlag;
-        String imageUrl;
 
         CircuitMetadata(double lengthKm, int laps, String lapRecordTime, String lapRecordHolder, int lapRecordYear,
-                String countryFlag, String imageUrl) {
+                String countryFlag) {
             this.lengthKm = lengthKm;
             this.laps = laps;
             this.lapRecordTime = lapRecordTime;
             this.lapRecordHolder = lapRecordHolder;
             this.lapRecordYear = lapRecordYear;
             this.countryFlag = countryFlag;
-            this.imageUrl = imageUrl;
         }
     }
 
@@ -182,55 +180,31 @@ public class F1DataService {
         TEAM_METADATA.put("Haas F1 Team", new TeamMetadata(
                 "Ayao Komatsu", "Kannapolis", "🇺🇸", "#B6BABD", 2016));
 
-        // 2024 Pist Metadata'ları (with circuit layout images from F1 media)
-        CIRCUIT_METADATA.put("bahrain", new CircuitMetadata(5.412, 57, "1:31.447", "P. de la Rosa", 2005, "🇧🇭",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Bahrain.png"));
-        CIRCUIT_METADATA.put("jeddah", new CircuitMetadata(6.174, 50, "1:30.734", "L. Hamilton", 2021, "🇸🇦",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Saudi%20Arabia.png"));
-        CIRCUIT_METADATA.put("albert_park", new CircuitMetadata(5.278, 58, "1:20.235", "C. Leclerc", 2024, "🇦🇺",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Australia.png"));
-        CIRCUIT_METADATA.put("suzuka", new CircuitMetadata(5.807, 53, "1:30.983", "L. Hamilton", 2019, "🇯🇵",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Japan.png"));
-        CIRCUIT_METADATA.put("shanghai", new CircuitMetadata(5.451, 56, "1:32.238", "M. Schumacher", 2004, "🇨🇳",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/China.png"));
-        CIRCUIT_METADATA.put("miami", new CircuitMetadata(5.412, 57, "1:29.708", "M. Verstappen", 2023, "🇺🇸",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Miami.png"));
-        CIRCUIT_METADATA.put("imola", new CircuitMetadata(4.909, 63, "1:15.484", "L. Hamilton", 2020, "🇮🇹",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Emilia%20Romagna.png"));
-        CIRCUIT_METADATA.put("monaco", new CircuitMetadata(3.337, 78, "1:12.909", "L. Hamilton", 2021, "🇲🇨",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Monaco.png"));
-        CIRCUIT_METADATA.put("villeneuve", new CircuitMetadata(4.361, 70, "1:13.078", "V. Bottas", 2019, "🇨🇦",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Canada.png"));
-        CIRCUIT_METADATA.put("catalunya", new CircuitMetadata(4.657, 66, "1:16.330", "M. Verstappen", 2023, "🇪🇸",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Spain.png"));
-        CIRCUIT_METADATA.put("red_bull_ring", new CircuitMetadata(4.318, 71, "1:05.619", "C. Sainz", 2020, "🇦🇹",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Austria.png"));
-        CIRCUIT_METADATA.put("silverstone", new CircuitMetadata(5.891, 52, "1:27.097", "M. Verstappen", 2020, "🇬🇧",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Great%20Britain.png"));
-        CIRCUIT_METADATA.put("hungaroring", new CircuitMetadata(4.381, 70, "1:16.627", "L. Hamilton", 2020, "🇭🇺",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Hungary.png"));
-        CIRCUIT_METADATA.put("spa", new CircuitMetadata(7.004, 44, "1:46.286", "V. Bottas", 2018, "🇧🇪",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Belgium.png"));
-        CIRCUIT_METADATA.put("zandvoort", new CircuitMetadata(4.259, 72, "1:11.097", "L. Hamilton", 2021, "🇳🇱",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Netherlands.png"));
-        CIRCUIT_METADATA.put("monza", new CircuitMetadata(5.793, 53, "1:21.046", "R. Barrichello", 2004, "🇮🇹",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Italy.png"));
-        CIRCUIT_METADATA.put("baku", new CircuitMetadata(6.003, 51, "1:43.009", "C. Leclerc", 2019, "🇦🇿",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Azerbaijan.png"));
-        CIRCUIT_METADATA.put("marina_bay", new CircuitMetadata(4.940, 62, "1:35.867", "L. Hamilton", 2023, "🇸🇬",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Singapore.png"));
-        CIRCUIT_METADATA.put("americas", new CircuitMetadata(5.513, 56, "1:36.169", "C. Leclerc", 2019, "🇺🇸",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/USA.png"));
-        CIRCUIT_METADATA.put("rodriguez", new CircuitMetadata(4.304, 71, "1:17.774", "V. Bottas", 2021, "🇲🇽",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Mexico.png"));
-        CIRCUIT_METADATA.put("interlagos", new CircuitMetadata(4.309, 71, "1:10.540", "V. Bottas", 2018, "🇧🇷",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Brazil.png"));
-        CIRCUIT_METADATA.put("vegas", new CircuitMetadata(6.201, 50, "1:35.490", "O. Piastri", 2023, "🇺🇸",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Las%20Vegas.png"));
-        CIRCUIT_METADATA.put("losail", new CircuitMetadata(5.380, 57, "1:24.319", "M. Verstappen", 2023, "🇶🇦",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Qatar.png"));
-        CIRCUIT_METADATA.put("yas_marina", new CircuitMetadata(5.281, 58, "1:26.103", "M. Verstappen", 2021, "🇦🇪",
-                "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245010/content/dam/fom-website/2018-redesign-assets/Circuit%20Layouts%202024/Abu%20Dhabi.png"));
+        // 2024 Pist Metadata'ları
+        CIRCUIT_METADATA.put("bahrain", new CircuitMetadata(5.412, 57, "1:31.447", "P. de la Rosa", 2005, "🇧🇭"));
+        CIRCUIT_METADATA.put("jeddah", new CircuitMetadata(6.174, 50, "1:30.734", "L. Hamilton", 2021, "🇸🇦"));
+        CIRCUIT_METADATA.put("albert_park", new CircuitMetadata(5.278, 58, "1:20.235", "C. Leclerc", 2024, "🇦🇺"));
+        CIRCUIT_METADATA.put("suzuka", new CircuitMetadata(5.807, 53, "1:30.983", "L. Hamilton", 2019, "🇯🇵"));
+        CIRCUIT_METADATA.put("shanghai", new CircuitMetadata(5.451, 56, "1:32.238", "M. Schumacher", 2004, "🇨🇳"));
+        CIRCUIT_METADATA.put("miami", new CircuitMetadata(5.412, 57, "1:29.708", "M. Verstappen", 2023, "🇺🇸"));
+        CIRCUIT_METADATA.put("imola", new CircuitMetadata(4.909, 63, "1:15.484", "L. Hamilton", 2020, "🇮🇹"));
+        CIRCUIT_METADATA.put("monaco", new CircuitMetadata(3.337, 78, "1:12.909", "L. Hamilton", 2021, "🇲🇨"));
+        CIRCUIT_METADATA.put("villeneuve", new CircuitMetadata(4.361, 70, "1:13.078", "V. Bottas", 2019, "🇨🇦"));
+        CIRCUIT_METADATA.put("catalunya", new CircuitMetadata(4.657, 66, "1:16.330", "M. Verstappen", 2023, "🇪🇸"));
+        CIRCUIT_METADATA.put("red_bull_ring", new CircuitMetadata(4.318, 71, "1:05.619", "C. Sainz", 2020, "🇦🇹"));
+        CIRCUIT_METADATA.put("silverstone", new CircuitMetadata(5.891, 52, "1:27.097", "M. Verstappen", 2020, "🇬🇧"));
+        CIRCUIT_METADATA.put("hungaroring", new CircuitMetadata(4.381, 70, "1:16.627", "L. Hamilton", 2020, "🇭🇺"));
+        CIRCUIT_METADATA.put("spa", new CircuitMetadata(7.004, 44, "1:46.286", "V. Bottas", 2018, "🇧🇪"));
+        CIRCUIT_METADATA.put("zandvoort", new CircuitMetadata(4.259, 72, "1:11.097", "L. Hamilton", 2021, "🇳🇱"));
+        CIRCUIT_METADATA.put("monza", new CircuitMetadata(5.793, 53, "1:21.046", "R. Barrichello", 2004, "🇮🇹"));
+        CIRCUIT_METADATA.put("baku", new CircuitMetadata(6.003, 51, "1:43.009", "C. Leclerc", 2019, "🇦🇿"));
+        CIRCUIT_METADATA.put("marina_bay", new CircuitMetadata(4.940, 62, "1:35.867", "L. Hamilton", 2023, "🇸🇬"));
+        CIRCUIT_METADATA.put("americas", new CircuitMetadata(5.513, 56, "1:36.169", "C. Leclerc", 2019, "🇺🇸"));
+        CIRCUIT_METADATA.put("rodriguez", new CircuitMetadata(4.304, 71, "1:17.774", "V. Bottas", 2021, "🇲🇽"));
+        CIRCUIT_METADATA.put("interlagos", new CircuitMetadata(4.309, 71, "1:10.540", "V. Bottas", 2018, "🇧🇷"));
+        CIRCUIT_METADATA.put("vegas", new CircuitMetadata(6.201, 50, "1:35.490", "O. Piastri", 2023, "🇺🇸"));
+        CIRCUIT_METADATA.put("losail", new CircuitMetadata(5.380, 57, "1:24.319", "M. Verstappen", 2023, "🇶🇦"));
+        CIRCUIT_METADATA.put("yas_marina", new CircuitMetadata(5.281, 58, "1:26.103", "M. Verstappen", 2021, "🇦🇪"));
     }
 
     public F1DataService(DriverRepository driverRepository, TeamRepository teamRepository,
@@ -414,6 +388,11 @@ public class F1DataService {
      */
     private Circuit getOrCreateCircuit(CircuitDto circuitDto) {
         return circuitRepository.findByCircuitId(circuitDto.circuitId)
+                .map(existingCircuit -> {
+                    // Mevcut kaydı bulursak da metadata'yı güncelle (yeni eklenen resimler için)
+                    populateCircuitMetadata(existingCircuit);
+                    return circuitRepository.save(existingCircuit);
+                })
                 .orElseGet(() -> {
                     Circuit circuit = new Circuit(circuitDto.circuitId, circuitDto.circuitName);
                     circuit.setCountry(circuitDto.location.country);
@@ -436,7 +415,6 @@ public class F1DataService {
             circuit.setLapRecordHolder(metadata.lapRecordHolder);
             circuit.setLapRecordYear(metadata.lapRecordYear);
             circuit.setCountryFlag(metadata.countryFlag);
-            circuit.setImageUrl(metadata.imageUrl);
         } else {
             circuit.setCountryFlag("🏁");
             logger.warn("Pist metadata'sı bulunamadı: {}", circuit.getCircuitId());
