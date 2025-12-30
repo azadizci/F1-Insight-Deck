@@ -18,6 +18,10 @@ public class DataInitializer {
             logger.info("========== VERİ YÜKLEMESİ BAŞLIYOR ==========");
             // Uygulama başladığında 2024 verilerini çek
             f1DataService.fetchAndSaveDriverStandings(2024);
+
+            // Yarış takvimini ve sonuçlarını çek
+            f1DataService.fetchAndSaveRaceCalendar(2024);
+
             logger.info("========== VERİ YÜKLEMESİ TAMAMLANDI ==========");
         };
     }

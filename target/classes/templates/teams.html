@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Insight Deck - Teams</title>
+    <meta name="description" content="Interactive F1 Team Dashboard with Stats">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ===== ROOT VARIABLES ===== */
+        :root {
+            --primary-red: #ff1801;
+            --neon-cyan: #00d2be;
+            --neon-blue: #3671C6;
+            --dark-bg: #0d0d0d;
+            --card-bg: rgba(20, 20, 20, 0.9);
+            --carbon-pattern: repeating-linear-gradient(45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255, 255, 255, 0.03) 2px,
+                    rgba(255, 255, 255, 0.03) 4px);
+        }
+
+        /* ===== GLOBAL STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--dark-bg);
+            background-image:
+                var(--carbon-pattern),
+                radial-gradient(ellipse at top, #1a1a2e 0%, #0d0d0d 50%);
+            min-height: 100vh;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(180deg, rgba(255, 24, 1, 0.15) 0%, transparent 100%);
+            padding: 2rem 0;
+            border-bottom: 2px solid var(--primary-red);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--primary-red), transparent);
+            animation: headerGlow 3s linear infinite;
+        }
+
+        @keyframes headerGlow {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(50%);
+            }
+        }
+
+        .logo-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            background: linear-gradient(135deg, #fff 0%, var(--primary-red) 50%, var(--neon-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 24, 1, 0.5);
+        }
+
+        .subtitle {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 300;
+            font-size: 1.1rem;
+            letter-spacing: 0.5em;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== NAVIGATION MENU ===== */
+        .main-nav {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .nav-link {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            padding: 1.2rem 2.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            color: var(--primary-red);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-red);
+            box-shadow: 0 0 10px var(--primary-red);
+        }
+
+        .nav-link.disabled {
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .nav-link.disabled::before {
+            content: '🔒 ';
+            font-size: 0.7rem;
+        }
+
+        /* ===== TEAMS SECTION ===== */
+        .teams-section {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-cyan), transparent);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        /* ===== TEAM CARD ===== */
+        .team-card {
+            background: var(--card-bg);
+            background-image: var(--carbon-pattern);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--team-color, var(--primary-red));
+            transition: height 0.3s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(255, 24, 1, 0.2),
+                inset 0 0 20px rgba(255, 255, 255, 0.05);
+        }
+
+        .team-card:hover::before {
+            height: 8px;
+            box-shadow: 0 0 20px var(--team-color, var(--primary-red));
+        }
+
+        .team-header {
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .team-logo-wrapper {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--team-color, var(--primary-red));
+        }
+
+        .team-logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--team-color, #fff);
+        }
+
+        .team-info h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.05em;
+        }
+
+        .team-country {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .team-stats {
+            padding: 1.5rem 2rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .team-stat {
+            text-align: center;
+        }
+
+        .team-stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 0%, var(--team-color, var(--neon-cyan)) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .team-stat-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .team-drivers {
+            padding: 1rem 2rem 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .mini-driver {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .mini-driver-img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--team-color, var(--primary-red));
+        }
+
+        /* ===== TEAM MODAL ===== */
+        .team-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .team-modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            background-image: var(--carbon-pattern);
+            border-radius: 24px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: modalSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-team-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--modal-team-color, var(--primary-red));
+            box-shadow: 0 0 30px var(--modal-team-color, var(--primary-red));
+            border-radius: 24px 24px 0 0;
+        }
+
+        .modal-header {
+            position: relative;
+            padding: 2.5rem 2rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: var(--primary-red);
+            transform: rotate(90deg);
+        }
+
+        .modal-team-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .modal-team-logo {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--modal-team-color, var(--primary-red));
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+        }
+
+        .modal-team-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-team-country {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--neon-cyan);
+        }
+
+        .drivers-section-modal {
+            margin-top: 2rem;
+        }
+
+        .drivers-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .drivers-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--neon-cyan);
+            border-radius: 2px;
+        }
+
+        .modal-drivers-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .modal-driver-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .modal-driver-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--modal-team-color, var(--primary-red));
+        }
+
+        .modal-driver-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--modal-team-color, var(--primary-red));
+        }
+
+        .modal-driver-name {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .modal-driver-stats {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .logo-title {
+                font-size: 1.8rem;
+                letter-spacing: 0.1em;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-team-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-drivers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="text-center" style="flex: 1;">
+                    <h1 class="logo-title">F1 Insight Deck</h1>
+                    <p class="subtitle">Team Statistics Dashboard</p>
+                </div>
+                <div class="user-nav" style="position: absolute; right: 40px; top: 50%; transform: translateY(-50%);">
+                    <div th:if="${session.userId}" class="logged-in"
+                        style="display: flex; align-items: center; gap: 15px;">
+                        <span style="color: rgba(255,255,255,0.8);">👋 Merhaba, <span th:text="${session.userName}"
+                                style="color: #e10600; font-weight: 600;">Kullanıcı</span></span>
+                        <a href="/profile"
+                            style="padding: 8px 16px; background: rgba(255,255,255,0.1); border-radius: 8px; color: white; text-decoration: none; font-size: 0.9rem;">Profil</a>
+                        <a href="/logout"
+                            style="padding: 8px 16px; border: 1px solid #e10600; border-radius: 8px; color: #e10600; text-decoration: none; font-size: 0.9rem;">Çıkış</a>
+                    </div>
+                    <div th:unless="${session.userId}" class="logged-out" style="display: flex; gap: 10px;">
+                        <a href="/login"
+                            style="padding: 8px 20px; background: rgba(255,255,255,0.1); border-radius: 8px; color: white; text-decoration: none; font-size: 0.9rem;">Giriş
+                            Yap</a>
+                        <a href="/register"
+                            style="padding: 8px 20px; background: #e10600; border-radius: 8px; color: white; text-decoration: none; font-size: 0.9rem; font-weight: 600;">Kayıt
+                            Ol</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Menu -->
+    <nav class="main-nav">
+        <div class="container">
+            <div class="nav-container">
+                <a href="/teams" class="nav-link" th:classappend="${activePage == 'teams'} ? 'active' : ''">Teams</a>
+                <a href="/drivers" class="nav-link"
+                    th:classappend="${activePage == 'drivers'} ? 'active' : ''">Drivers</a>
+                <a href="/tracks" class="nav-link" th:classappend="${activePage == 'tracks'} ? 'active' : ''">Tracks</a>
+                <a href="#" class="nav-link disabled">Cars</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Teams Grid Section -->
+    <section class="teams-section">
+        <div class="container">
+            <h2 class="section-title">2024 Constructor Standings</h2>
+            <div class="team-grid">
+                <div th:each="team : ${teams}" class="team-card" th:data-id="${team.id}"
+                    th:style="'--team-color: ' + ${team.teamColor}" onclick="handleTeamClick(this)">
+                    <div class="team-header">
+                        <div class="team-logo-wrapper">
+                            <span class="team-logo-text" th:text="${#strings.substring(team.name, 0, 2)}">RB</span>
+                        </div>
+                        <div class="team-info">
+                            <h3 th:text="${team.name}">Team Name</h3>
+                            <div class="team-country">
+                                <span th:text="${team.countryFlag}">🏁</span>
+                                <span th:text="${team.nationality}">Nationality</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-stats">
+                        <div class="team-stat">
+                            <div class="team-stat-value" th:text="${team.totalPoints}">0</div>
+                            <div class="team-stat-label">Points</div>
+                        </div>
+                        <div class="team-stat">
+                            <div class="team-stat-value" th:text="${team.totalWins}">0</div>
+                            <div class="team-stat-label">Wins</div>
+                        </div>
+                        <div class="team-stat">
+                            <div class="team-stat-value" th:text="${team.totalPodiums}">0</div>
+                            <div class="team-stat-label">Podiums</div>
+                        </div>
+                    </div>
+                    <div class="team-drivers">
+                        <div th:each="driver : ${team.drivers}" class="mini-driver">
+                            <img th:src="${driver.imageUrl}" th:alt="${driver.name}" class="mini-driver-img">
+                            <span th:text="${#strings.substringAfter(driver.name, ' ')}">Driver</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>F1 Insight Deck &copy; 2024 | Data for demonstration purposes</p>
+    </footer>
+
+    <!-- Team Details Modal -->
+    <div class="team-modal" id="teamModal">
+        <div class="modal-content">
+            <div class="modal-team-bar"></div>
+            <div class="modal-header">
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+                <div class="modal-team-info">
+                    <div class="modal-team-logo" id="modalTeamLogo">RB</div>
+                    <div>
+                        <h2 class="modal-team-name" id="modalTeamName">Team Name</h2>
+                        <div class="modal-team-country">
+                            <span id="modalTeamFlag">🏁</span>
+                            <span id="modalTeamNationality">Nationality</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Team Principal</div>
+                        <div class="info-value" id="modalTeamPrincipal">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Headquarters</div>
+                        <div class="info-value" id="modalHeadquarters">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">First Entry</div>
+                        <div class="info-value" id="modalFirstEntry">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Total Points</div>
+                        <div class="info-value" id="modalTotalPoints">0</div>
+                    </div>
+                </div>
+
+                <div class="drivers-section-modal">
+                    <h3 class="drivers-title">Current Drivers</h3>
+                    <div class="modal-drivers-grid" id="modalDriversGrid">
+                        <!-- Drivers will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        let currentTeamId = null;
+
+        function handleTeamClick(card) {
+            const teamId = card.dataset.id;
+            const teamColor = getComputedStyle(card).getPropertyValue('--team-color').trim();
+            currentTeamId = teamId;
+            fetchTeamData(teamId, teamColor);
+        }
+
+        async function fetchTeamData(teamId, teamColor) {
+            try {
+                const response = await fetch(`/api/team/${teamId}`);
+                if (!response.ok) throw new Error('Failed to fetch team data');
+
+                const team = await response.json();
+                displayTeamModal(team, teamColor);
+            } catch (error) {
+                console.error('Error fetching team:', error);
+            }
+        }
+
+        function displayTeamModal(team, teamColor) {
+            const modal = document.getElementById('teamModal');
+            const modalContent = modal.querySelector('.modal-content');
+
+            // Set team color
+            modalContent.style.setProperty('--modal-team-color', teamColor);
+            modal.querySelector('.modal-team-bar').style.background = teamColor;
+            modal.querySelector('.modal-team-bar').style.boxShadow = `0 0 30px ${teamColor}`;
+
+            // Populate data
+            document.getElementById('modalTeamLogo').textContent = team.name.substring(0, 2);
+            document.getElementById('modalTeamLogo').style.color = teamColor;
+            document.getElementById('modalTeamName').textContent = team.name;
+            document.getElementById('modalTeamFlag').textContent = team.countryFlag || '🏁';
+            document.getElementById('modalTeamNationality').textContent = team.nationality || '-';
+            document.getElementById('modalTeamPrincipal').textContent = team.teamPrincipal || '-';
+            document.getElementById('modalHeadquarters').textContent = team.headquarters || '-';
+            document.getElementById('modalFirstEntry').textContent = team.firstEntry || '-';
+            document.getElementById('modalTotalPoints').textContent = team.totalPoints || 0;
+
+            // Build drivers grid
+            const driversGrid = document.getElementById('modalDriversGrid');
+            driversGrid.innerHTML = '';
+
+            if (team.drivers && team.drivers.length > 0) {
+                team.drivers.forEach(driver => {
+                    const driverCard = document.createElement('div');
+                    driverCard.className = 'modal-driver-card';
+                    driverCard.innerHTML = `
+                        <img src="${driver.imageUrl}" alt="${driver.name}" class="modal-driver-img">
+                        <div>
+                            <div class="modal-driver-name">${driver.name}</div>
+                            <div class="modal-driver-stats">${driver.points} pts • ${driver.wins} wins</div>
+                        </div>
+                    `;
+                    driversGrid.appendChild(driverCard);
+                });
+            }
+
+            // Show modal
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('teamModal');
+            modal.classList.remove('active');
+            currentTeamId = null;
+        }
+
+        // Close modal on backdrop click
+        document.getElementById('teamModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+
+</html>

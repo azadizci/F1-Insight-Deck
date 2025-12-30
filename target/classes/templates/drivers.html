@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Insight Deck</title>
+    <meta name="description" content="Interactive F1 Driver Dashboard with Stats and Race Results">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ===== ROOT VARIABLES ===== */
+        :root {
+            --primary-red: #ff1801;
+            --neon-cyan: #00d2be;
+            --neon-blue: #3671C6;
+            --dark-bg: #0d0d0d;
+            --card-bg: rgba(20, 20, 20, 0.9);
+            --carbon-pattern: repeating-linear-gradient(45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255, 255, 255, 0.03) 2px,
+                    rgba(255, 255, 255, 0.03) 4px);
+        }
+
+        /* ===== GLOBAL STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--dark-bg);
+            background-image:
+                var(--carbon-pattern),
+                radial-gradient(ellipse at top, #1a1a2e 0%, #0d0d0d 50%);
+            min-height: 100vh;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(180deg, rgba(255, 24, 1, 0.15) 0%, transparent 100%);
+            padding: 2rem 0;
+            border-bottom: 2px solid var(--primary-red);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--primary-red), transparent);
+            animation: headerGlow 3s linear infinite;
+        }
+
+        @keyframes headerGlow {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(50%);
+            }
+        }
+
+        .logo-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            background: linear-gradient(135deg, #fff 0%, var(--primary-red) 50%, var(--neon-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 24, 1, 0.5);
+        }
+
+        .subtitle {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 300;
+            font-size: 1.1rem;
+            letter-spacing: 0.5em;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== DRIVER GRID ===== */
+        .drivers-section {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-cyan), transparent);
+        }
+
+        .driver-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        /* ===== DRIVER CARD ===== */
+        .driver-card {
+            background: var(--card-bg);
+            background-image: var(--carbon-pattern);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .driver-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--team-color, var(--primary-red));
+            transition: height 0.3s ease;
+        }
+
+        .driver-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(255, 24, 1, 0.2),
+                inset 0 0 20px rgba(255, 255, 255, 0.05);
+        }
+
+        .driver-card:hover::before {
+            height: 6px;
+            box-shadow: 0 0 20px var(--team-color, var(--primary-red));
+        }
+
+        .driver-image-wrapper {
+            position: relative;
+            height: 280px;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%);
+        }
+
+        .driver-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+            transition: transform 0.5s ease, filter 0.3s ease;
+        }
+
+        .driver-card:hover .driver-image {
+            transform: scale(1.1);
+            filter: brightness(1.1);
+        }
+
+        .driver-number {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.15);
+            text-shadow: 0 0 20px var(--team-color, var(--primary-red));
+        }
+
+        .country-flag {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-size: 2rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+        }
+
+        .driver-info {
+            padding: 1.5rem;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.9) 100%);
+            position: relative;
+            margin-top: -60px;
+        }
+
+        .driver-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.05em;
+        }
+
+        .driver-team {
+            font-size: 0.9rem;
+            color: var(--team-color, var(--neon-cyan));
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .quick-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* ===== F1 CAR ANIMATION OVERLAY ===== */
+        .animation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        .animation-overlay.active {
+            display: flex;
+        }
+
+        /* Racing lines effect */
+        .speed-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .speed-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            animation: speedLine 0.3s linear infinite;
+            opacity: 0;
+        }
+
+        .animation-overlay.active .speed-line {
+            opacity: 1;
+        }
+
+        @keyframes speedLine {
+            0% {
+                transform: translateX(100vw);
+            }
+
+            100% {
+                transform: translateX(-100px);
+            }
+        }
+
+        /* F1 Car Animation */
+        .f1-car-container {
+            position: absolute;
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            transform-style: preserve-3d;
+        }
+
+        .f1-car {
+            position: absolute;
+            right: -600px;
+            width: 500px;
+            height: auto;
+            filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 50px var(--primary-red));
+            transform: rotateY(-5deg) rotateX(2deg);
+            animation: none;
+        }
+
+        .f1-car.animate {
+            animation: driveBy 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+        }
+
+        @keyframes driveBy {
+            0% {
+                right: -600px;
+                transform: rotateY(-15deg) rotateX(5deg) scale(0.8);
+                filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 30px var(--primary-red));
+            }
+
+            20% {
+                transform: rotateY(-8deg) rotateX(3deg) scale(1);
+            }
+
+            50% {
+                right: calc(50% - 250px);
+                transform: rotateY(0deg) rotateX(0deg) scale(1.2);
+                filter: drop-shadow(0 20px 60px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 80px var(--primary-red)) drop-shadow(0 0 120px var(--neon-cyan));
+            }
+
+            80% {
+                transform: rotateY(8deg) rotateX(-3deg) scale(1);
+            }
+
+            100% {
+                right: calc(100% + 100px);
+                transform: rotateY(15deg) rotateX(-5deg) scale(0.8);
+                filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 30px var(--primary-red));
+            }
+        }
+
+        /* Tire smoke effect */
+        .tire-smoke {
+            position: absolute;
+            bottom: 20%;
+            right: -500px;
+            width: 200px;
+            height: 100px;
+            background: radial-gradient(ellipse, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            filter: blur(20px);
+            opacity: 0;
+        }
+
+        .f1-car.animate~.tire-smoke {
+            animation: smokeTrail 1.5s ease-out forwards;
+        }
+
+        @keyframes smokeTrail {
+
+            0%,
+            20% {
+                opacity: 0;
+                right: -500px;
+            }
+
+            30% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 0;
+                right: calc(100% + 300px);
+            }
+        }
+
+        /* ===== DRIVER DETAILS MODAL ===== */
+        .driver-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .driver-modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            background-image: var(--carbon-pattern);
+            border-radius: 24px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: modalSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            position: relative;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-team-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--modal-team-color, var(--primary-red));
+            box-shadow: 0 0 30px var(--modal-team-color, var(--primary-red));
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: var(--primary-red);
+            transform: rotate(90deg);
+        }
+
+        .modal-driver-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .modal-driver-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--modal-team-color, var(--primary-red));
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-driver-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-driver-team {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.1rem;
+            color: var(--modal-team-color, var(--neon-cyan));
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .team-logo {
+            height: 30px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 210, 190, 0.2);
+        }
+
+        .stat-card .value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 0%, var(--neon-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-card .label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-top: 0.5rem;
+        }
+
+        /* Last 10 Races Chart */
+        .races-section {
+            margin-top: 2rem;
+        }
+
+        .races-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .races-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--neon-cyan);
+            border-radius: 2px;
+        }
+
+        .race-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .race-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .race-name {
+            width: 120px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .race-bar-container {
+            flex: 1;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .race-bar {
+            height: 100%;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .race-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .race-position {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        /* Position colors */
+        .position-1 {
+            background: linear-gradient(90deg, #ffd700, #ffed4a);
+        }
+
+        .position-2 {
+            background: linear-gradient(90deg, #c0c0c0, #e8e8e8);
+        }
+
+        .position-3 {
+            background: linear-gradient(90deg, #cd7f32, #e6a756);
+        }
+
+        .position-4,
+        .position-5 {
+            background: linear-gradient(90deg, var(--neon-cyan), #4de6d9);
+        }
+
+        .position-6,
+        .position-7,
+        .position-8,
+        .position-9,
+        .position-10 {
+            background: linear-gradient(90deg, #6366f1, #818cf8);
+        }
+
+        .position-other {
+            background: linear-gradient(90deg, #64748b, #94a3b8);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+        }
+
+        /* ===== NAVIGATION MENU ===== */
+        .main-nav {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .nav-link {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            padding: 1.2rem 2.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            color: var(--primary-red);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-red);
+            box-shadow: 0 0 10px var(--primary-red);
+        }
+
+        .nav-link.disabled {
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .nav-link.disabled::before {
+            content: '🔒 ';
+            font-size: 0.7rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .logo-title {
+                font-size: 1.8rem;
+                letter-spacing: 0.1em;
+            }
+
+            .driver-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-driver-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .modal-driver-name {
+                font-size: 1.8rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .race-name {
+                width: 80px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="text-center" style="flex: 1;">
+                    <h1 class="logo-title">F1 Insight Deck</h1>
+                    <p class="subtitle">Driver Statistics Dashboard</p>
+                </div>
+                <div class="user-nav" style="position: absolute; right: 40px; top: 50%; transform: translateY(-50%);">
+                    <div th:if="${session.userId}" class="logged-in"
+                        style="display: flex; align-items: center; gap: 15px;">
+                        <span style="color: rgba(255,255,255,0.8);">👋 Merhaba, <span th:text="${session.userName}"
+                                style="color: #e10600; font-weight: 600;">Kullanıcı</span></span>
+                        <a href="/profile"
+                            style="padding: 8px 16px; background: rgba(255,255,255,0.1); border-radius: 8px; color: white; text-decoration: none; font-size: 0.9rem;">Profil</a>
+                        <a href="/logout"
+                            style="padding: 8px 16px; border: 1px solid #e10600; border-radius: 8px; color: #e10600; text-decoration: none; font-size: 0.9rem;">Çıkış</a>
+                    </div>
+                    <div th:unless="${session.userId}" class="logged-out" style="display: flex; gap: 10px;">
+                        <a href="/login"
+                            style="padding: 8px 20px; background: rgba(255,255,255,0.1); border-radius: 8px; color: white; text-decoration: none; font-size: 0.9rem;">Giriş
+                            Yap</a>
+                        <a href="/register"
+                            style="padding: 8px 20px; background: #e10600; border-radius: 8px; color: white; text-decoration: none; font-size: 0.9rem; font-weight: 600;">Kayıt
+                            Ol</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Menu -->
+    <nav class="main-nav">
+        <div class="container">
+            <div class="nav-container">
+                <a href="/teams" class="nav-link" th:classappend="${activePage == 'teams'} ? 'active' : ''">Teams</a>
+                <a href="/drivers" class="nav-link"
+                    th:classappend="${activePage == 'drivers'} ? 'active' : ''">Drivers</a>
+                <a href="/tracks" class="nav-link" th:classappend="${activePage == 'tracks'} ? 'active' : ''">Tracks</a>
+                <a href="#" class="nav-link disabled">Cars</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Driver Grid Section -->
+    <section class="drivers-section">
+        <div class="container">
+            <h2 class="section-title">2024 Season Drivers</h2>
+            <div class="driver-grid">
+                <div th:each="driver : ${drivers}" class="driver-card" th:data-id="${driver.id}"
+                    th:style="'--team-color: ' + ${driver.teamColor}" onclick="handleDriverClick(this)">
+                    <div class="driver-image-wrapper">
+                        <img th:src="${driver.imageUrl}" th:alt="${driver.name}" class="driver-image" loading="lazy">
+                        <span class="driver-number" th:text="${driver.id}"></span>
+                        <span class="country-flag" th:text="${driver.countryFlag}"></span>
+                    </div>
+                    <div class="driver-info">
+                        <h3 class="driver-name" th:text="${driver.name}">Driver Name</h3>
+                        <p class="driver-team" th:text="${driver.team}">Team Name</p>
+                        <div class="quick-stats">
+                            <div class="stat-item">
+                                <div class="stat-value" th:text="${driver.wins}">0</div>
+                                <div class="stat-label">Wins</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" th:text="${driver.podiums}">0</div>
+                                <div class="stat-label">Podiums</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" th:text="${driver.points}">0</div>
+                                <div class="stat-label">Points</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>F1 Insight Deck &copy; 2024 | Data for demonstration purposes</p>
+    </footer>
+
+    <!-- F1 Car Animation Overlay -->
+    <div class="animation-overlay" id="animationOverlay">
+        <div class="speed-lines">
+            <div class="speed-line" style="top: 20%; animation-delay: 0s;"></div>
+            <div class="speed-line" style="top: 35%; animation-delay: 0.1s;"></div>
+            <div class="speed-line" style="top: 50%; animation-delay: 0.05s;"></div>
+            <div class="speed-line" style="top: 65%; animation-delay: 0.15s;"></div>
+            <div class="speed-line" style="top: 80%; animation-delay: 0.08s;"></div>
+        </div>
+        <div class="f1-car-container">
+            <!-- 
+                F1 CAR IMAGE: Replace the src below with your own F1 car image if needed.
+                Current image is located at: /images/f1-car.png (in static resources)
+            -->
+            <img src="/images/f1-car.png" alt="F1 Racing Car" class="f1-car" id="f1Car">
+            <div class="tire-smoke"></div>
+        </div>
+    </div>
+
+    <!-- Driver Details Modal -->
+    <div class="driver-modal" id="driverModal">
+        <div class="modal-content">
+            <div class="modal-team-bar"></div>
+            <div class="modal-header">
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+                <div class="modal-driver-info">
+                    <img src="" alt="Driver" class="modal-driver-image" id="modalDriverImage">
+                    <div>
+                        <h2 class="modal-driver-name" id="modalDriverName">Driver Name</h2>
+                        <div class="modal-driver-team">
+                            <img src="" alt="Team Logo" class="team-logo" id="modalTeamLogo">
+                            <span id="modalTeamName">Team Name</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="value" id="modalWins">0</div>
+                        <div class="label">Career Wins</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="modalPodiums">0</div>
+                        <div class="label">Podium Finishes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="modalPoints">0</div>
+                        <div class="label">Season Points</div>
+                    </div>
+                </div>
+
+                <div class="races-section">
+                    <h3 class="races-title">Last 10 Race Results</h3>
+                    <div class="race-bars" id="raceBars">
+                        <!-- Race bars will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        let currentDriverId = null;
+
+        function handleDriverClick(card) {
+            const driverId = card.dataset.id;
+            const teamColor = getComputedStyle(card).getPropertyValue('--team-color').trim();
+            currentDriverId = driverId;
+
+            // Start animation
+            showCarAnimation(teamColor, driverId);
+        }
+
+        function showCarAnimation(teamColor, driverId) {
+            const overlay = document.getElementById('animationOverlay');
+            const f1Car = document.getElementById('f1Car');
+
+            // Reset animation
+            f1Car.classList.remove('animate');
+            void f1Car.offsetWidth; // Trigger reflow
+
+            // Show overlay and start animation
+            overlay.classList.add('active');
+            f1Car.classList.add('animate');
+
+            // After animation completes, fetch and show driver data
+            setTimeout(() => {
+                overlay.classList.remove('active');
+                f1Car.classList.remove('animate');
+                fetchDriverData(driverId, teamColor);
+            }, 1500);
+        }
+
+        async function fetchDriverData(driverId, teamColor) {
+            try {
+                const response = await fetch(`/api/driver/${driverId}`);
+                if (!response.ok) throw new Error('Failed to fetch driver data');
+
+                const driver = await response.json();
+                displayDriverModal(driver, teamColor);
+            } catch (error) {
+                console.error('Error fetching driver:', error);
+            }
+        }
+
+        function displayDriverModal(driver, teamColor) {
+            const modal = document.getElementById('driverModal');
+            const modalContent = modal.querySelector('.modal-content');
+
+            // Set team color
+            modalContent.style.setProperty('--modal-team-color', teamColor);
+            modal.querySelector('.modal-team-bar').style.background = teamColor;
+            modal.querySelector('.modal-team-bar').style.boxShadow = `0 0 30px ${teamColor}`;
+
+            // Populate data
+            document.getElementById('modalDriverImage').src = driver.imageUrl;
+            document.getElementById('modalDriverName').textContent = driver.name;
+            document.getElementById('modalTeamLogo').src = driver.teamLogo;
+            document.getElementById('modalTeamName').textContent = driver.team;
+            document.getElementById('modalWins').textContent = driver.wins;
+            document.getElementById('modalPodiums').textContent = driver.podiums;
+            document.getElementById('modalPoints').textContent = driver.points;
+
+            // Build race bars
+            const raceBarsContainer = document.getElementById('raceBars');
+            raceBarsContainer.innerHTML = '';
+
+            if (driver.lastTenRaces && driver.lastTenRaces.length > 0) {
+                driver.lastTenRaces.forEach((race, index) => {
+                    const barWidth = Math.max(5, 100 - (race.position - 1) * 5);
+                    const positionClass = getPositionClass(race.position);
+
+                    const raceItem = document.createElement('div');
+                    raceItem.className = 'race-bar-item';
+                    raceItem.innerHTML = `
+                        <span class="race-name">${race.raceName}</span>
+                        <div class="race-bar-container">
+                            <div class="race-bar ${positionClass}" style="width: 0%;">
+                                <span class="race-position">P${race.position}</span>
+                            </div>
+                        </div>
+                    `;
+                    raceBarsContainer.appendChild(raceItem);
+
+                    // Animate bar width
+                    setTimeout(() => {
+                        raceItem.querySelector('.race-bar').style.width = `${barWidth}%`;
+                    }, 100 + index * 80);
+                });
+            }
+
+            // Show modal
+            modal.classList.add('active');
+        }
+
+        function getPositionClass(position) {
+            if (position === 1) return 'position-1';
+            if (position === 2) return 'position-2';
+            if (position === 3) return 'position-3';
+            if (position <= 5) return 'position-4';
+            if (position <= 10) return 'position-6';
+            return 'position-other';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('driverModal');
+            modal.classList.remove('active');
+            currentDriverId = null;
+        }
+
+        // Close modal on backdrop click
+        document.getElementById('driverModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+
+</html>

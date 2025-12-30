@@ -1,7 +1,6 @@
-com\f1insight\F1InsightDeckApplication.class
 com\f1insight\service\DriverService.class
 com\f1insight\repository\DriverRepository.class
 com\f1insight\model\Driver.class
+com\f1insight\F1InsightDeckApplication.class
 com\f1insight\model\RaceResult.class
-com\f1insight\controller\F1Controller.class
 com\f1insight\repository\RaceResultRepository.class

@@ -9,20 +9,27 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-public class F1Controller {
+public class DriverController {
 
     private final DriverService driverService;
 
-    public F1Controller(DriverService driverService) {
+    public DriverController(DriverService driverService) {
         this.driverService = driverService;
     }
 
-    @GetMapping("/")
-    public String index(Model model) {
+    /**
+     * Pilotlar sayfası
+     */
+    @GetMapping("/drivers")
+    public String drivers(Model model) {
         model.addAttribute("drivers", driverService.getAllDrivers());
-        return "index";
+        model.addAttribute("activePage", "drivers");
+        return "drivers";
     }
 
+    /**
+     * Pilot detayları API endpoint
+     */
     @GetMapping("/api/driver/{id}")
     @ResponseBody
     public Driver getDriver(@PathVariable Long id) {

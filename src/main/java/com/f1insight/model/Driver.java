@@ -1,6 +1,7 @@
 package com.f1insight.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 
 @Entity
@@ -16,6 +17,11 @@ public class Driver {
 
     @Column(nullable = false)
     private String team;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    @JsonIgnore
+    private Team teamEntity;
 
     private int wins;
     private int podiums;
@@ -142,5 +148,13 @@ public class Driver {
 
     public void setLastTenRaces(List<RaceResult> lastTenRaces) {
         this.lastTenRaces = lastTenRaces;
+    }
+
+    public Team getTeamEntity() {
+        return teamEntity;
+    }
+
+    public void setTeamEntity(Team teamEntity) {
+        this.teamEntity = teamEntity;
     }
 }
