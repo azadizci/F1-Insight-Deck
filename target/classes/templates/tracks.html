@@ -474,31 +474,7 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
-        /* ===== CIRCUIT IMAGE ===== */
-        .circuit-image-section {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
 
-        .circuit-image {
-            max-width: 100%;
-            max-height: 300px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 20px rgba(0, 210, 190, 0.3));
-        }
-
-        .circuit-image-label {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.5);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-top: 1rem;
-        }
 
         /* ===== FOOTER ===== */
         .footer {
@@ -623,13 +599,13 @@
                         <span class="round-label">Round</span>
                     </div>
                     <div class="race-info">
-                        <div class="race-date" th:text="${#temporals.format(race.raceDate, 'dd MMMM yyyy')}">01 March
-                            2024</div>
+                        <div class="race-date"
+                            th:text="${#temporals.format(race.raceDate, 'dd MMMM yyyy', T(java.util.Locale).ENGLISH)}">
+                            01 March 2024</div>
                         <div class="race-name" th:text="${race.raceName}">Grand Prix</div>
                         <div class="race-circuit">
                             <span th:text="${race.circuit?.countryFlag}">🏁</span>
                             <span th:text="${race.circuit?.name}">Circuit Name</span>
-                            <span>•</span>
                             <span th:text="${race.circuit?.country}">Country</span>
                         </div>
                     </div>
@@ -670,13 +646,6 @@
                 </div>
             </div>
             <div class="modal-body">
-                <!-- Circuit Layout Image -->
-                <div class="circuit-image-section" id="circuitImageSection">
-                    <img id="modalCircuitImage" class="circuit-image" src="" alt="Circuit Layout"
-                        onerror="this.parentElement.style.display='none'">
-                    <div class="circuit-image-label">Circuit Layout</div>
-                </div>
-
                 <div class="info-grid">
                     <div class="info-item">
                         <div class="info-label">Track Length</div>
@@ -743,16 +712,6 @@
             document.getElementById('modalLapRecord').textContent = race.circuit?.lapRecordTime || '-';
             document.getElementById('modalRecordHolder').textContent = race.circuit?.lapRecordHolder || '-';
             document.getElementById('modalRecordYear').textContent = race.circuit?.lapRecordYear || '-';
-
-            // Circuit layout image
-            const circuitImageSection = document.getElementById('circuitImageSection');
-            const circuitImage = document.getElementById('modalCircuitImage');
-            if (race.circuit?.imageUrl) {
-                circuitImage.src = race.circuit.imageUrl;
-                circuitImageSection.style.display = 'block';
-            } else {
-                circuitImageSection.style.display = 'none';
-            }
 
             // Show modal
             modal.classList.add('active');

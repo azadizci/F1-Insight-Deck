@@ -318,11 +318,11 @@
 
         .f1-car {
             position: absolute;
-            right: -600px;
+            left: -600px;
             width: 500px;
             height: auto;
             filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 50px var(--primary-red));
-            transform: rotateY(-5deg) rotateX(2deg);
+            transform: rotateY(5deg) rotateX(2deg);
             animation: none;
         }
 
@@ -332,28 +332,28 @@
 
         @keyframes driveBy {
             0% {
-                right: -600px;
-                transform: rotateY(-15deg) rotateX(5deg) scale(0.8);
+                left: -600px;
+                transform: rotateY(15deg) rotateX(5deg) scale(0.8);
                 filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 30px var(--primary-red));
             }
 
             20% {
-                transform: rotateY(-8deg) rotateX(3deg) scale(1);
+                transform: rotateY(8deg) rotateX(3deg) scale(1);
             }
 
             50% {
-                right: calc(50% - 250px);
+                left: calc(50% - 250px);
                 transform: rotateY(0deg) rotateX(0deg) scale(1.2);
                 filter: drop-shadow(0 20px 60px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 80px var(--primary-red)) drop-shadow(0 0 120px var(--neon-cyan));
             }
 
             80% {
-                transform: rotateY(8deg) rotateX(-3deg) scale(1);
+                transform: rotateY(-8deg) rotateX(-3deg) scale(1);
             }
 
             100% {
-                right: calc(100% + 100px);
-                transform: rotateY(15deg) rotateX(-5deg) scale(0.8);
+                left: calc(100% + 100px);
+                transform: rotateY(-15deg) rotateX(-5deg) scale(0.8);
                 filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 30px var(--primary-red));
             }
         }
@@ -362,7 +362,7 @@
         .tire-smoke {
             position: absolute;
             bottom: 20%;
-            right: -500px;
+            left: -500px;
             width: 200px;
             height: 100px;
             background: radial-gradient(ellipse, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
@@ -379,7 +379,7 @@
             0%,
             20% {
                 opacity: 0;
-                right: -500px;
+                left: -500px;
             }
 
             30% {
@@ -388,7 +388,7 @@
 
             100% {
                 opacity: 0;
-                right: calc(100% + 300px);
+                left: calc(100% + 300px);
             }
         }
 

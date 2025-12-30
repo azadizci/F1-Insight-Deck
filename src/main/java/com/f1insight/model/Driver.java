@@ -26,9 +26,12 @@ public class Driver {
     private int wins;
     private int podiums;
     private int points;
+    @Column(length = 1000)
     private String imageUrl;
     private String country;
+    @Column(length = 1000)
     private String countryFlag;
+    @Column(length = 1000)
     private String teamLogo;
     private String teamColor;
 

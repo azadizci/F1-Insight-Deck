@@ -17,10 +17,12 @@ public class Team {
 
     private String nationality;
     private String teamColor;
+    @Column(length = 1000)
     private String countryFlag;
     private String headquarters;
     private String teamPrincipal;
     private Integer firstEntry;
+    @Column(length = 1000)
     private String logoUrl;
 
     @OneToMany(mappedBy = "teamEntity", fetch = FetchType.LAZY)

@@ -24,7 +24,6 @@ public class Circuit {
     private String lapRecordTime; // All-time tur rekoru
     private String lapRecordHolder; // Rekor sahibi
     private Integer lapRecordYear; // Rekorun kırıldığı yıl
-    private String imageUrl; // Pist layout görseli
 
     public Circuit() {
     }
@@ -123,11 +122,4 @@ public class Circuit {
         this.lapRecordYear = lapRecordYear;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
 }
